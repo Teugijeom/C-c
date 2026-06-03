@@ -460,15 +460,15 @@ int startBattle(int enemy_type, int floor) {
     else {
         if (floor == 1) {
             e_name = "처형자 고르";
-            e_max_hp = 80;
+            e_max_hp = 100;
         }
         else if (floor == 2) {
             e_name = "광신도 수장 모르탄";
-            e_max_hp = 100;
+            e_max_hp = 120;
         }
         else if (floor == 3) {
             e_name = "나이트메어";
-            e_max_hp = 150;
+            e_max_hp = 200;
         }
         else {
             e_name = "심연의 핵";
