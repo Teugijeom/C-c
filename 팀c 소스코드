@@ -460,11 +460,11 @@ int startBattle(int enemy_type, int floor) {
     else {
         if (floor == 1) {
             e_name = "처형자 고르";
-            e_max_hp = 100;
+            e_max_hp = 80;
         }
         else if (floor == 2) {
             e_name = "광신도 수장 모르탄";
-            e_max_hp = 120;
+            e_max_hp = 100;
         }
         else if (floor == 3) {
             e_name = "나이트메어";
@@ -1425,8 +1425,8 @@ int main(void) {
                 }
             }
             else if (target == 4) {
-                player_hp += 30;
-                player_mp += 10;
+                player_hp += 40;
+                player_mp += 15;
                 if (player_hp > player_max_hp) player_hp = player_max_hp;
                 if (player_mp > player_max_mp) player_mp = player_max_mp;
                 strcpy(message_log, "회복 물약을 마셨습니다! (HP, MP 회복)");
