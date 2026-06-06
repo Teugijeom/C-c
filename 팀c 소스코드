@@ -17,6 +17,7 @@ void setCursorPosition(int x, int y) {
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
 }
 
+// 커서 숨기기
 void hideCursor(void) {
     CONSOLE_CURSOR_INFO info;
     info.dwSize = 100;
@@ -24,6 +25,7 @@ void hideCursor(void) {
     SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &info);
 }
 
+// 커서 보이기
 void showCursor(void) {
     CONSOLE_CURSOR_INFO info;
     info.dwSize = 100;
@@ -31,13 +33,9 @@ void showCursor(void) {
     SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &info);
 }
 
+// 색 설정
 void setColor(int color_number) {
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color_number);
-}
-
-void PEnter(char message[]) {
-    printf("%s\n", message);
-    getchar();
 }
 
 // --------------------------------------------------------
@@ -45,7 +43,7 @@ void PEnter(char message[]) {
 // --------------------------------------------------------
 #define MAX_INVEN 9
 
-typedef struct {
+typedef struct { 
     char name[40];
     int bonus_atk;
     int crit_chance; // 백분율 (0 ~ 100)
@@ -365,7 +363,7 @@ void renderMap(int px, int py) {
             if (abs(x - px) <= 5 && abs(y - py) <= 5) {
                 if (x == px && y == py) {
                     setColor(10);
-                    printf("@ ");
+                    printf("@ "); // 플레이어(초록)
                 }
                 else {
                     switch (map[y][x]) {
@@ -373,34 +371,34 @@ void renderMap(int px, int py) {
                         printf("  "); break;
                     case 1:
                         setColor(8);
-                        printf("##"); break;
+                        printf("##"); break; // 벽(회색)
                     case 2:
                         setColor(15);
-                        printf("S "); break;
+                        printf("S "); break; // 시작점(밝은 흰색)
                     case 3:
                         setColor(13);
-                        printf(player_has_key ? "O " : "X "); break;
+                        printf(player_has_key ? "O " : "X "); break; 출구(보라)
                     case 4:
                         setColor(14);
-                        printf("+ "); break;
+                        printf("+ "); break; // 회복 물약(노랑)
                     case 5:
                         setColor(12);
-                        printf("^^"); break;
+                        printf("^^"); break; // 가시 함정(빨강)
                     case 6:
                         setColor(7);
-                        printf("U "); break;
+                        printf("U "); break; // 몬스터(흰색)
                     case 7:
                         setColor(12);
-                        printf("B "); break;
+                        printf("B "); break; // 보스(빨강)
                     case 8:
                         setColor(12);
-                        printf("%%%%"); break;
+                        printf("%%%%"); break; // 잠긴 보스룸 문(빨강)
                     case 9:
                         setColor(13);
-                        printf("%%%%"); break;
-                    case 10: // 보물상자 타일
+                        printf("%%%%"); break; // 열린 보스룸 문(보라)
+                    case 10:
                         setColor(11);
-                        printf("T "); break;
+                        printf("T "); break; // 보물상자(청록)
                     default:
                         printf("  "); break;
                     }
@@ -424,16 +422,17 @@ void renderMap(int px, int py) {
 // RPG 턴제 전투 시스템
 // 반환값: 승리 1, 도망 0, 패배 -1
 // --------------------------------------------------------
+// 전투 함수 (nm: 나이트메어 전용)
 int startBattle(int enemy_type, int floor) {
     int e_max_hp;
-    const char* e_name;
-    int e_hp;
-    char b_log[200] = "";
-    int is_defending = 0;
-    int action_five_choice = 0;
-    int nm_turn = 0;
-    int nm_immune_next = 0;
-    int nm_copy_skill = 0;
+    const char* e_name; // 적이름(문자열 포인터)
+    int e_hp; // 적 체력
+    char b_log[200] = ""; // 전투 로그 메세지
+    int is_defending = 0; // 3번 플레이어 방어
+    int action_five_choice = 0; // 5번 mp 회복 횟수(전투당 1회)
+    int nm_turn = 0; // 나이트메어 턴 카운터(3턴 마다 hp회복 발동)
+    int nm_immune_next = 0; // 나이트메어 hp 회복
+    int nm_copy_skill = 0; // 나이트메어 mp 흡수
 
     int action;
     int player_dmg;
@@ -443,7 +442,10 @@ int startBattle(int enemy_type, int floor) {
 
     system("cls"); // 화면 지우기
 
-    if (enemy_type == 6) {
+    // type 6: 일반 몬스터, type 7: 보스
+    // floor: 미궁 층
+
+    if (enemy_type == 6) { 
         if (floor == 1) {
             e_name = "언데드 병사";
             e_max_hp = 30;
@@ -457,7 +459,7 @@ int startBattle(int enemy_type, int floor) {
             e_max_hp = 40;
         }
     }
-    else {
+    else { 
         if (floor == 1) {
             e_name = "처형자 고르";
             e_max_hp = 80;
@@ -488,11 +490,12 @@ int startBattle(int enemy_type, int floor) {
 
         system("cls");
 
+        // 적 이름, 적 상태 출력
         printf("\n  ==============================================================\n");
-        printf("                        [ %s ]\n", e_name);
+        printf("                        [ %s ]\n", e_name); 
         printf("                        HP: %3d / %3d\n\n", e_hp, e_max_hp);
 
-        if ((enemy_type == 7) && (map_floor == 1)) {
+        if ((enemy_type == 7) && (map_floor == 1)) { // 아스키 아트
             setColor(12);
             printf("                                                  \n");
             printf("                ~:;,                              \n");
@@ -772,15 +775,15 @@ int startBattle(int enemy_type, int floor) {
             printf("                            .\n");
         }
 
-        setColor(15);
-        printf("  --------------------------------------------------------------\n");
+        setColor(15); 
+        printf("  --------------------------------------------------------------\n"); // 플레이어 상태창 
         printf("  [ %s ] HP: %3d / %3d  |  MP: %2d / %2d\n", player_name,
             player_hp, player_max_hp, player_mp, player_max_mp);
         printf("  --------------------------------------------------------------\n");
-        setColor(14);
-        printf("  >> %s\n", b_log);
+        setColor(14); 
+        printf("  >> %s\n", b_log); // 적 등장, 적 반격 출력
         setColor(15);
-        printf("  ==============================================================\n");
+        printf("  ==============================================================\n"); // 플레이어 기술 선택창
         printf("   1. [공격]          3. [방어] (받는 피해 50%% 감소)\n");
         printf("   2. [스킬] (-10MP)  4. [도망]\n");
         printf("   5. [마나 회복]     6. [치유] (-15MP) \n");
@@ -792,6 +795,7 @@ int startBattle(int enemy_type, int floor) {
         action = _getch();
         is_defending = 0;
 
+        // 1번 공격: 머리(1), 몸통(2) 중 선택
         if (action == '1') {
             printf("  공격할 적의 부위를 선택하세요. 머리(1)[명중50%%/데미지2.5배] | 몸통(2)[명중90%%/데미지1배]: \n");
             fflush(stdout);
@@ -800,16 +804,16 @@ int startBattle(int enemy_type, int floor) {
             int base_accuracy = 0;
             double part_multiplier = 1.0;
 
-            if (target == '1') { // 머리 공격
+            if (target == '1') { // 머리 공격: 명중률 50, 적에게 2.5배 데미지
                 base_accuracy = 50;
                 part_multiplier = 2.5;
-                player_dmg = 15 + current_weapon.bonus_atk;
+                player_dmg = 15 + current_weapon.bonus_atk; // 기본 15 + 장비 추가 데미지
                 sprintf(b_log, "%s의 저격 공격(머리)! ", player_name);
             }
-            else { // 몸통 공격
+            else { // 몸통 공격: 명중률 90, 적에게 1배 데미지
                 base_accuracy = 90;
                 part_multiplier = 1.0;
-                player_dmg = 13 + current_weapon.bonus_atk;
+                player_dmg = 13 + current_weapon.bonus_atk; // 기본 13 + 장비 추가 데미지
                 sprintf(b_log, "%s의 안정적인 공격(몸통)! ", player_name);
             }
 
@@ -829,7 +833,7 @@ int startBattle(int enemy_type, int floor) {
                 // [업데이트] 대미지 분산도 (80% ~ 120%) 적용
                 player_dmg = (int)(player_dmg * ((rand() % 41 + 80) / 100.0));
 
-                if ((enemy_type == 7) && (map_floor == 2)) {
+                if ((enemy_type == 7) && (map_floor == 2)) { // 2층 보스는 머리는 5, 몸통은 3으로 데미지 고정
                     player_dmg = (target == '1') ? 5 : 3;
                     sprintf(b_log, "%s의 공격. 하지만 %s에게 큰 효과는 없는 듯 하다.", player_name, e_name);
                 }
@@ -848,10 +852,10 @@ int startBattle(int enemy_type, int floor) {
             fflush(stdout);
             Sleep(800);
         }
-        else if (action == '2') {
+        else if (action == '2') { // 스킬: mp 10 소모 
             if (player_mp >= 10) {
                 player_mp -= 10;
-                player_dmg = rand() % 11 + 15 + current_weapon.bonus_atk;
+                player_dmg = rand() % 11 + 15 + current_weapon.bonus_atk; // 기본 15 + 장비 추가 데미지 + 랜덤 추가 데미지
 
                 if ((rand() % 100 + 1) <= current_weapon.crit_chance) {
                     player_dmg = (int)(player_dmg * 1.5);
@@ -882,22 +886,22 @@ int startBattle(int enemy_type, int floor) {
             fflush(stdout);
             Sleep(800);
         }
-        else if (action == '3') {
+        else if (action == '3') { // 방어: 적에게 받는 피해 50% 감소
             is_defending = 1;
             sprintf(b_log, "%s는 방어 태세를 취했다.", player_name);
             if ((enemy_type == 7) && (map_floor == 2)) {
                 player_dmg = rand() % 11 + 15 + current_weapon.bonus_atk;
-                e_hp -= player_dmg;
+                e_hp -= player_dmg; // 2층 보스에게 사용시 스킬(2)과 같은 피해
                 sprintf(b_log, "%s에게 %d의 피해! 효과가 있어 보인다.", e_name, player_dmg);
             }
             printf("  >> %s\n", b_log);
             fflush(stdout);
             Sleep(800);
         }
-        else if (action == '4') {
-            if (enemy_type == 7) {
+        else if (action == '4')  // 도망
+            if (enemy_type == 7) { // 보스전에서는 도망 불가
                 sprintf(b_log, "보스와의 전투에서는 도망칠 수 없다!");
-                continue;
+                continue; // 턴 안넘어가게 다시 선택
             }
             else {
                 printf("\n  >> %s는 무사히 도망쳤다!\n", player_name);
@@ -907,20 +911,20 @@ int startBattle(int enemy_type, int floor) {
                 return 0;
             }
         }
-        else if (action == '5') {
+        else if (action == '5') { mp 회복: 전투중 1번만 사용 가능, 10 mp 회복 
             if (action_five_choice >= 1) {
                 sprintf(b_log, "이미 이 전투에서 MP를 회복 했습니다!\n");
                 printf("  >> %s\n", b_log);
                 fflush(stdout);
                 Sleep(800);
-                continue;
+                continue; // 턴 안넘어가게 다시 선택
             }
             else if (player_mp == 30) {
                 sprintf(b_log, "MP가 이미 가득 찼습니다!");
                 printf("  >> %s\n", b_log);
                 fflush(stdout);
                 Sleep(800);
-                continue;
+                continue; // 턴 안넘어가게 다시 선택
             }
             else {
                 player_mp += 10;
@@ -931,7 +935,7 @@ int startBattle(int enemy_type, int floor) {
                 Sleep(800);
             }
         }
-        else if (action == '6') { // [업데이트] 치유 스킬
+        else if (action == '6') { // [업데이트] 치유 스킬 : 15 mp 감소
             if (player_mp >= 15) {
                 player_mp -= 15;
                 int heal_amount = rand() % 11 + 80; // 80 ~ 91 회복
@@ -955,24 +959,30 @@ int startBattle(int enemy_type, int floor) {
         if (e_hp <= 0) break;
 
         // 적 반격
-        if (enemy_type == 6) {
-            enemy_dmg = rand() % 5 + 8;
-            if (is_defending) enemy_dmg /= 2;
+        // 모든 적은 렌덤 데미지 + 고정 데미지로 구성
+        // 방어(3) 사용시 데미지 50% 감소
+
+        if (enemy_type == 6) { // 일반 몬스터 반격
+            enemy_dmg = rand() % 5 + 8; 
+            if (is_defending) enemy_dmg /= 2; 
         }
-        else if (enemy_type == 7) {
-            if (map_floor == 1) {
-                enemy_dmg = rand() % 11 + 20;
+        else if (enemy_type == 7) { // 보스 반격
+            if (map_floor == 1) { 
+                enemy_dmg = rand() % 11 + 20; 
             }
             else if (map_floor == 2) {
-                enemy_dmg = rand() % 11 + 25;
+                enemy_dmg = rand() % 11 + 25; 
                 if (is_defending) enemy_dmg /= 2;
             }
+            // 3층 보스
+            // 일반 공격, hp 회복, mp 흡수로 구성
+
             else if (map_floor == 3) {
-                nm_immune_next = (nm_turn % 3 == 0) ? 1 : 0;
+                nm_immune_next = (nm_turn % 3 == 0) ? 1 : 0; // 3턴 마다 발동
 
                 if (nm_immune_next) {
                     if (player_dmg > 0) {
-                        e_hp += player_dmg;
+                        e_hp += player_dmg; // 플레이거가 준 데미지만큼 hp 회복
                         printf("  >> 나이트메어: 겨우 이 정도인가...\n");
                         printf("  >> 나이트메어가 HP를 회복했다.\n");
                         fflush(stdout);
@@ -1004,13 +1014,14 @@ int startBattle(int enemy_type, int floor) {
                 }
             }
         }
+        // 플레이어가 입은 피해 출력
         player_hp -= enemy_dmg;
         sprintf(b_log, "%s의 반격! %s에게 %d의 피해!", e_name, player_name, enemy_dmg);
         Sleep(800);
     }
 
     system("cls");
-    if (player_hp <= 0) return -1;
+    if (player_hp <= 0) return -1; // 패배 판정
     return 1;
 }
 
@@ -1054,6 +1065,7 @@ int main(void) {
     inventory[0] = current_weapon;
     inven_count = 1;
 
+    // 시작 화면 아스키 아트
     printf("   ___  ______ __   __ _____  _____ \n");
     printf("  / _ \\ | ___ \\\\ \\ / //  ___|/  ___|\n");
     printf(" / /_\\ \\| |_/ / \\ V / \\ `--. \\ `--. \n");
@@ -1062,11 +1074,14 @@ int main(void) {
     printf(" \\_| |_/\\____/   \\_/  \\____/ \\____/ \n");
     printf("                                    \n");
 
+    // 플레이어 이름 입력
+    // 글자 수 초과시 다시 입력
+
     do {
         printf("\n\n");
         printf("  미궁으로 향할 전사여, 당신의 이름(10자 이내)을 입력 하라: ");
         if (scanf("%10s", player_name) != 1) {
-            strcpy(player_name, "Hero");
+            strcpy(player_name, "Hero"); // 입력 오류 발생시 HERO로  자동 지정
         }
         while (getchar() != '\n');
 
@@ -1080,39 +1095,34 @@ int main(void) {
 
     system("cls");
 
+    // 배경 스토리 전개
     printf("\n");
     printf("\n  세상에는 어느 날 갑자기 나타난 거대한 지하 미궁, 아비스 미궁이 존재한다.\n\n");
     printf("\n  (계속 하려면 아무키나 누르세오.)\n");
     _getch();
 
     printf("\n  그 미궁은 살아 있는 생명체처럼 끊임없이 구조가 변하고, 들어간 사람 대부분은 돌아오지 못한다.\n\n");
-    printf("\n  (계속 하려면 아무키나 누르세오.)\n");
     _getch();
 
     printf("\n  하지만 미궁의 가장 깊은 곳에는 불가사의한 힘을 지닌 심연의 핵이 숨겨져 있다는 전설이 있다.\n\n");
-    printf("\n  (계속 하려면 아무키나 누르세오.)\n");
     _getch();
 
     printf("\n  그리고 어느 날 죽은 줄 알았던 전설의 전사, %s가 다시 미궁으로 향한다.\n\n", player_name);
-    printf("\n (계속 하려면 아무키나 누르세오.)\n");
     _getch();
 
     printf("\n  10년 전, %s는 동료들과 함께 미궁 최하층에 도달했지만 정체불명의 존재 ???에게 습격당해 모든 동료를 잃었다.\n\n", player_name);
-    printf("\n  (계속 하려면 아무키나 누르세오.)\n");
     _getch();
 
     printf("\n  %s는 간신히 살아 돌아왔지만 그날 이후 악몽에 시달리며 은둔 생활을 한다.\n\n", player_name);
-    printf("\n  (계속 하려면 아무키나 누르세오.)\n");
     _getch();
 
     printf("\n  그러던 어느 날 밤, 죽은 동료의 목소리가 들린다.\n\n");
-    printf("\n  (계속 하려면 아무키나 누르세오.)\n");
     _getch();
 
     printf("\n  %s... 미궁은 아직 끝나지 않았다.\n\n", player_name);
-    printf("\n  (계속 하려면 아무키나 누르세오.)\n\n");
     _getch();
 
+    // 플레이어 아스키 아트 출력
     printf("                                                                      \n");
     printf("                                   -                                  \n");
     printf("                                   !                                  \n");
@@ -1183,7 +1193,6 @@ int main(void) {
     printf("                       -. ,;~~               -,     !~                  \n");
 
     printf("\n  %s은/는 검을 다시 들었다. 그리고 그의 몸에 과거 최하층에서 새겨진 검은 문양이 수상한 기운을 드러내기 시작한다.\n\n", player_name);
-    printf("\n  (미궁에 진입하려면 아무키나 누르세오.)\n\n");
     _getch();
 
     printf("\n  ...\n\n");
@@ -1375,6 +1384,7 @@ int main(void) {
             }
             else if ((target == 7) && (map_floor == 3)) {
                 system("cls");
+                // 나이트메어 보스전 
                 printf("\n");
                 printf("\n  %s: 너만 죽이면 이 미궁도 끝이다.\n\n", player_name);
                 fflush(stdout); _getch();
@@ -1401,6 +1411,7 @@ int main(void) {
                 printf("\n  (아무키나 눌러 최후의 전투를 시작하세요.)\n\n");
                 fflush(stdout); _getch();
 
+                // 나이트메어 전투 승리
                 result = startBattle(7, map_floor);
                 if (result == 1) {
                     system("cls");
@@ -1424,6 +1435,8 @@ int main(void) {
                     fflush(stdout); _getch();
                 }
             }
+            // 회복 물약 접촉
+            // mp 15, hp 40 회복
             else if (target == 4) {
                 player_hp += 40;
                 player_mp += 15;
@@ -1433,6 +1446,7 @@ int main(void) {
                 map[next_y][next_x] = 0;
                 player_x = next_x; player_y = next_y;
             }
+            
             else if (target == 3) {
                 if (player_has_key) {
                     stage_cleared = 1;
@@ -1441,6 +1455,7 @@ int main(void) {
                     strcpy(message_log, "출구가 잠겨있습니다. 보스를 처치해야 합니다.");
                 }
             }
+            // 최하층 미궁의 핵
             else if (target == 8 && map_floor == 4) {
                 system("cls");
                 printf("                                                   \n");
@@ -1527,6 +1542,7 @@ int main(void) {
             if (player_hp <= 0) is_game_over = 1;
         }
 
+        // 각 층 클리어
         if (stage_cleared) {
             system("cls");
             printf("\n\n");
@@ -1570,6 +1586,7 @@ int main(void) {
 
                 initGameElements2();
 
+                // 미궁 2층 진입시 대사 출력
                 system("cls");
                 printf("\n  ???: 이 세상은 거짓이며 오로지 아비스만이 진실 이니라...\n\n");
                 fflush(stdout); _getch();
@@ -1594,6 +1611,7 @@ int main(void) {
 
                 initGameElements3();
 
+                // 미궁 3층 진입시 대사 출력
                 system("cls");
                 printf("\n");
                 printf("\n  ???: 10년 만이군 전사여.\n\n");
@@ -1624,6 +1642,7 @@ int main(void) {
 
                 initGameElements4();
 
+                // 미궁 최하층 진입시 대사 출력
                 system("cls");
                 printf("\n");
                 printf("\n  심연의 깊은 곳에서 무언가의 기운이 느껴진다.\n\n");
@@ -1639,6 +1658,7 @@ int main(void) {
 
     } while (stage_cleared);
 
+    // 게임 오버 아스키 아트 출력
     if (is_game_over) {
         system("cls");
         printf("\n\n");
@@ -1654,6 +1674,7 @@ int main(void) {
         printf("  =========================================================================\n");
     }
     else {
+        // 모든 층 완료시 후일담과 함께 게임 클리어 아스키아트 출력 
         system("cls");
         printf("\n\n");
         setColor(14);
@@ -1672,6 +1693,7 @@ int main(void) {
         printf(" \\____/\\_| |_/\\_|  |_/\\____/  \\____/\\_____/\\____/ \\_| |_/\\_| \\_|\n");
         printf("  =========================================================================\n");
     }
+    // 게임 종료
     printf("\n  (아무 키나 누르면 종료됩니다.)\n");
     fflush(stdout);
     _getch();
