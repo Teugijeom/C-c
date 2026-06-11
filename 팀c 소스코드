@@ -17,16 +17,16 @@ void setCursorPosition(int x, int y) {
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
 }
 
-// 커서 숨기기
-void hideCursor(void) {
+// 커서를 숨겨 화면이 반짝거리는 현상 방지
+void hideCursor(void) { 
     CONSOLE_CURSOR_INFO info;
     info.dwSize = 100;
     info.bVisible = FALSE;
     SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &info);
 }
 
-// 커서 보이기
-void showCursor(void) {
+// 숨겨둔 커서를 다시 화면에 출력
+void showCursor(void) { 
     CONSOLE_CURSOR_INFO info;
     info.dwSize = 100;
     info.bVisible = TRUE;
@@ -208,6 +208,9 @@ int map4[7][15] = {
 // --------------------------------------------------------
 // 게임 초기화 및 상자(10) 배치
 // --------------------------------------------------------
+// 1층부터 4층까지 각 스테이지가 시작될 때 실행
+// 맵 배열(map)의 특정 좌표에 함정, 언데드, 보스, 보물상자 타일을 초기 배치
+
 void initGameElements(void) {
     map[13][10] = 5; map[13][14] = 5; map[17][10] = 5; map[17][14] = 5;
     map[15][9] = 6; map[6][12] = 6; map[23][12] = 6;
