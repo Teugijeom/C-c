@@ -994,7 +994,7 @@ int startBattle(int enemy_type, int floor) {
                     enemy_dmg = 16;
                     if (is_defending) enemy_dmg /= 2;
                 }
-                else if (nm_copy_skill) { // 30% 확률로 나이트메어가 플레이어 mp흡수(881즐)
+                else if (nm_copy_skill) { // 30% 확률로 nm_copy_skill = 1 이면 나이트메어가 플레이어 mp흡수(881즐)
                     nm_copy_skill = 0;
                     if (player_mp >= 10) {
                         player_mp -= 10;
